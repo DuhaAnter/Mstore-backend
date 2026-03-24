@@ -1,0 +1,2 @@
+---->  .env must be in the same folder as package.json  .
+---->  dotenv automatically looks for a file named .env in the current working directory — which is the root of your project (where you run npm run dev).
