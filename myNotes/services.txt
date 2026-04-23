@@ -1,0 +1,21 @@
+Why do people add a Services layer?
+The Service layer is where you put all the real business logic.
+Think of it like this:
+
+- Controller = "The waiter" :
+
+Job: 
+Take the order from the customer (the HTTP request).
+Extract what is needed from req.body or req.params .
+Call the kitchen (service).
+Return the food nicely to the customer (send JSON response).
+Handle errors and HTTP status codes.
+
+- Service = "The chef / kitchen" :
+
+Job:
+Actually cook the food (do the real work).
+Contains all business rules and logic.
+Talks to the database (Prisma).
+Can be reused by multiple controllers.
+Much easier to test.

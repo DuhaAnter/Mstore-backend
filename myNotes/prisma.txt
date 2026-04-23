@@ -1,0 +1,41 @@
+1- Prisma CLI as a development dependency. This tool handles migrations and generates the client.
+## npm install prisma@6 --save-dev
+
+2- This will generate your schema.prisma file .
+## npx prisma init
+
+3- Open the .env file and update the DATABASE_URL with your credentials.
+
+4- ensure your schema.prisma file points to the correct provider.
+
+5- Define Your Models in schema.prisma
+
+6- sync your schema with your database. (Run Migrations)
+##npx prisma migrate dev --name first_migration
+
+7- Install and Generate Prisma Client
+note: The migrate command usually triggers a "generate" automatically, but you can do it manually to ensure the types are ready for your code.
+##npm i @prisma/client@6
+##npx prisma generate
+
+**************************************************
+
+---> npx prisma migrate dev: This is the "Architect." It looks at your schema.prisma file, compares it to your actual PostgreSQL database, and writes the SQL code to create your tables. It also automatically triggers a "generate" at the end.
+
+---> npx prisma generate: This is the "Translator." It looks at your schema and updates the Prisma Client (the code you use in your files like prisma.product.create). This gives you that sweet auto-completion and TypeScript safety.
+
+**************************************************
+
+--->  In Prisma, @unique on a foreign key turns a relationship into One-to-One.
+
+---> Facker
+1- install
+##npm install @faker-js/faker --save-dev
+2- create file seed.js inside prisma folder 
+3- DON'T FORGET TO ADD THIS IN PACKAGE.JSON
+"prisma": {
+  "seed": "node prisma/seed.js"
+}
+4- run it 
+##npx prisma db seed
+
