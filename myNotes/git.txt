@@ -1,0 +1,15 @@
+##git log origin/main..HEAD 
+-- This command is like asking Git for a "pre-flight summary." It shows you exactly what is about to be sent to the server.
+
+    1- 
+    origin/main: This represents the last version of your code that the remote server (e.g., GitHub) has seen.
+
+    2-
+    ..: This is Git's way of saying "everything between A and B."
+
+    3-
+    HEAD: This represents your local machine's current state (your latest commits).
+
+-- In plain English: "Show me everything I have done locally (HEAD) that the remote server (origin/main) doesn't know about yet."
+
+note : If you see a commit message like f3s2a11 OOPS TESTING DONT PUSH, you know you need to fix your history before you actually run git push.
