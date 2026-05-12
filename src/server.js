@@ -11,12 +11,15 @@ app.use(cors());
 app.use(express.json());
 // Import routes
 const productRoutes = require('./routes/products');
+const userRoutes = require ('./routes/users.js')
 // main route
 app.get('/', (req, res) => {
   res.json({ message: 'M-Store Backend is running' });
 });
 // Use routes
 app.use('/products', productRoutes);
+app.use('/users', userRoutes);
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
