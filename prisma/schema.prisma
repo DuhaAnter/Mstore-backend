@@ -7,35 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 // notes:
 
 //Using OrderItem with priceAtPurchase means that if you raise the price of a t-shirt tomorrow, your sales reports for today won't break.
 //Linking the Cart and Order to the Variant instead of the Product is the "secret sauce" for clothing stores. it ensures the warehouse knows exactly which size and color were purchased.
 
 model User {
-  id               String    @id @default(uuid())
+  id               String        @id @default(uuid())
   name             String
-  email            String    @unique
+  email            String        @unique
   password         String
-  role             userRole  @default(USER)
+  role             userRole      @default(USER)
   favoriteProducts Product[]
   reviews          Review[]
   orders           Order[]
   cart             Cart?
-  stripeCustomerId String?       // The ID of the "Customer" object in Stripe
-  paymentCards PaymentCard[]
+  stripeCustomerId String? // The ID of the "Customer" object in Stripe
+  paymentCards     PaymentCard[]
 }
 
 model PaymentCard {
-  id           String     @id @default(uuid())
-  token        String  
-  last4        String  
-  brand        String  
-  expMonth     Int
-  expYear      Int
-  userId       String
-  user         User    @relation(fields: [userId], references: [id])
+  id       String @id @default(uuid())
+  token    String
+  last4    String
+  brand    String
+  expMonth Int
+  expYear  Int
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
 }
 
 model Cart {
@@ -69,16 +68,19 @@ model Product {
   reviews       Review[]
   variants      Variant[]
   // 1. These fields store the "Address" to the Category/SubCategory pair
-  categoryId    String
-  subCategoryId String
+  // a. Made these fields optional (String?) so they can accept NULL
+  categoryId    String?
+  subCategoryId String?
+  
 
   // 2. This creates the official link
-  categoryGroup CatSubCategory @relation(fields: [categoryId, subCategoryId], references: [categoryId, subCategoryId])
+  // b. Added onDelete: SetNull here so the product is no longer linked to cat or sub cat
+  categoryGroup CatSubCategory? @relation(fields: [categoryId, subCategoryId], references: [categoryId, subCategoryId], onDelete: SetNull)
 }
 
 model Category {
   id            String           @id @default(uuid())
-  name          String
+  name          String           @unique
   // Opposite relation field added here
   subCategories CatSubCategory[]
 }
@@ -94,8 +96,10 @@ model CatSubCategory {
   categoryId    String
   subCategoryId String
 
-  category    Category    @relation(fields: [categoryId], references: [id])
-  subCategory SubCategory @relation(fields: [subCategoryId], references: [id])
+  // c. Added onDelete: Cascade so the link drops when the parent Category or SubCategory dies
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subCategory SubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  
 
   products Product[]
 
@@ -138,7 +142,7 @@ model Order {
   items           OrderItem[]
   coupon          Coupon?     @relation(fields: [couponId], references: [id])
   couponId        String?
-  status          orderStatus  @default(PENDING)
+  status          orderStatus @default(PENDING)
 }
 
 enum orderStatus {
@@ -147,6 +151,7 @@ enum orderStatus {
   DELIVERED
   CANCELLED
 }
+
 model OrderItem {
   id              String  @id @default(uuid())
   order           Order   @relation(fields: [orderId], references: [id])

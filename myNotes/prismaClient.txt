@@ -1,0 +1,29 @@
+--> when using PostgreSQL, Prisma’s equals filter is case-sensitive by default. If your database has "Electronics" but your cate variable is "electronics", Prisma will return null.
+
+## const cateExist = await prisma.category.findFirst({
+  where: {
+    name: {
+      equals: cate,
+      mode: 'insensitive', // This makes "Apple" match "apple"
+    },
+  },
+});
+
+-- the property "equals" takes a string.
+-- the property "data" takes an object and always mirrors your schema.prisma 
+
+-- Note : Postgres and MongoDB. MySQL and SQLite are usually case-insensitive by default depending on your collation settings.
+
+--------------------------------------------------------------------
+-- You cannot set a foreign key to null if that key is part of a Primary Key.
+(set null on delete when deleting a category)
+
+-- This is the most realistic behavior for an e-commerce store:
+
+   1- When a Category is deleted, the relationship link inside CatSubCategory is deleted automatically (onDelete: Cascade).
+
+   2- The Product stays alive, but its category fields are set to null so it becomes "Uncategorized" (onDelete: SetNull).
+
+To make this work, the relation scalar fields in your Product model must be optional (String?).
+
+-- if a category (like "Men") is deleted, the association pairing ("Men-Shoes") has no reason to exist anymore. this cleans up that pairing table automatically while preserving your actual Product records by safely setting their category references to null.

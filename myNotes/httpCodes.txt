@@ -1,0 +1,5 @@
+- 409
+used when the request is formatted perfectly, but it conflicts with the current state of the server (usually the database). 
+err-> "record already exists".
+or when 
+Two users try to update the same record at the exact same microsecond.

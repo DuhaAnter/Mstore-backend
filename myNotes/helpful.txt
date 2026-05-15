@@ -1,0 +1,5 @@
+-- I want you to stop thinking about "CRUD for models" and start thinking about "User Flows". In a real-world application, CRUD is rarely just about hitting a table; it's about enabling a specific action for a specific user.
+
+-- You should care about (transforming cate names) for data integrity and searchability.
+
+As a backend developer, your job is to ensure data is consistent. If one user saves "Electronics" and another saves "electronics," and you don't handle it, your database ends up messy, and your "unique" constraints might fail to catch duplicates.
