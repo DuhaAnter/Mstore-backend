@@ -14,7 +14,6 @@ const productRoutes = require('./routes/products');
 const userRoutes = require ('./routes/users.js');
 const categoryRoutes =require('./routes/categories.js');
 const subCategoryRoutes =require('./routes/subCategories.js');
-
 // main route
 app.get('/', (req, res) => {
   res.json({ message: 'M-Store Backend is running' });
