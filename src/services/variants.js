@@ -51,7 +51,7 @@ const deleteVariant = async (id) => {
 };
 const updateVariant = async (id, oldVariant, updatedVariantData) => {
     // Extract the incoming partial updates 
-    const { size, color, price } = updatedVariantData;
+    const { size, color , price , stock } = updatedVariantData;
     // Duplicate Prevention Logic
     // We only need to check for duplicates if the client is changing the size OR the color
 
@@ -86,7 +86,8 @@ const updateVariant = async (id, oldVariant, updatedVariantData) => {
         data: {
             size,
             color,
-            price
+            price,
+            stock
         }
     });
     return updatedVariant;

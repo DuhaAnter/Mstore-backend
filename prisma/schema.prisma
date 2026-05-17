@@ -63,7 +63,6 @@ model Product {
   title         String
   description   String?
   imageURL      String
-  stock         Int
   favoritedBy   User[]
   reviews       Review[]
   variants      Variant[]
@@ -112,6 +111,7 @@ model Variant {
   color      String
   price      Float
   size       String
+  stock         Int      @default(0)
   product    Product     @relation(fields: [productId], references: [id])
   productId  String
   cartItems  CartItem[]
@@ -140,11 +140,27 @@ model Order {
   userId          String
   shippingAddress String
   items           OrderItem[]
-  coupon          Coupon?     @relation(fields: [couponId], references: [id])
+//"onDelete: SetNull" ensures that if an admin deletes an old coupon from the system, your historical orders don't crash or get deleted. the couponId field simply turns to null, preserving the order history.
+  coupon          Coupon?     @relation(fields: [couponId], references: [id],onDelete: SetNull)
   couponId        String?
   status          orderStatus @default(PENDING)
+//makes financial reporting and frontend rendering much easier
+  discountApplied  Float @default(0)
+  paymentMethod    PaymentMethod @default(CASH_ON_DELIVERY)
+  paymentStatus    PaymentStatus @default(PENDING)
+}
+enum PaymentMethod {
+  CASH_ON_DELIVERY
+  CREDIT_CARD
+  MOBILE_WALLET
 }
 
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
 enum orderStatus {
   PENDING
   SHIPPED
