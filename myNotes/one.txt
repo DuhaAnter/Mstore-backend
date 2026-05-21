@@ -1,2 +1,5 @@
 ---->  .env must be in the same folder as package.json  .
 ---->  dotenv automatically looks for a file named .env in the current working directory — which is the root of your project (where you run npm run dev).
+
+
+--->  Databases and standard backend libraries always store dates in UTC time (Coordinated Universal Time)(Zulu time / Z) to keep things standardized across the world.

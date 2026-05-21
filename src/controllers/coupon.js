@@ -24,11 +24,8 @@ const updateCpn = async (req, res) => {
         const id = req.params.id;
         const updatedCpn = req.body;
         const result = await CpnService.updateCpn(id, updatedCpn);
-        if (result.error1) {
-            return res.status(404).json({ message: result.error1 });
-        }
-        if (result.error2) {
-            res.status(400).json({ message: result.error2 });
+        if (result.error) {
+            return res.status(404).json({ message: result.error });
         }
 
         return res.status(200).json({ message: "Coupon updated successfully.", data: result });

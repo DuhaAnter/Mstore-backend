@@ -34,16 +34,8 @@ const getCpn = async(id)=>{
 const updateCpn = async(id,updatedCpn)=>{
     const coupon = await prisma.coupon.findUnique({ where: { id } });
     if (!coupon) {
-     return {error1:"Coupon not found"}
+     return {error:"Coupon not found"}
     }
-    const code = updatedCpn.code;
-    const existingCoupon = await prisma.coupon.findUnique({
-        where: { code }
-      });
-      if (existingCoupon && existingCoupon.id !== id) {
-        return {error2:"This coupon code is already taken"}
-      }
-
       const updatedCoupon = await prisma.coupon.update({
       where: { id },
       data: updatedCpn
