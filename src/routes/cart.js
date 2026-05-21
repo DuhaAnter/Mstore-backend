@@ -3,6 +3,10 @@ const router = express.Router();
 const cartCrtl = require('../controllers/cart.js');
 const {validate} = require ('../middleware/validate.js');
 const {cartItemSchema} = require('../validations/cartItem.js');
+const {auth}= require('../middleware/auth.js');
+
+// no one is allowed to enter those routes unless they are logged in
+router.use(auth);
 
 router.get('/',cartCrtl.getCart);
 router.post('/',validate(cartItemSchema),cartCrtl.addToCart);

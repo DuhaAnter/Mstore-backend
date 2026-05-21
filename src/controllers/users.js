@@ -62,7 +62,7 @@ const updateUser = async (req, res) => {
         const userUpdatedData = req.body;
         const userToUpdate = await userService.getUserById(id);
         if (!userToUpdate) {
-            res.status(404).json({ message: "user not found" });
+            return res.status(404).json({ message: "user not found" });
         }
         const userAfterUpdate = await userService.updateUser(id, userUpdatedData);
         res.status(200).json({

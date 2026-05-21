@@ -68,7 +68,7 @@ const login = async (email, password) => {
     //The first argument of jwt.sign() is the payload. This is the data that will be encoded into the token.
     const token = await jwt.sign({ id: user.id, name: user.name, role: user.role }
         , process.env.SECRET
-        , { expiresIn: '1d' })
+        , { expiresIn: '7d' })
 
     return { token: token }
 };

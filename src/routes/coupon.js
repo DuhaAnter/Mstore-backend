@@ -3,7 +3,9 @@ const router = express.Router();
 const cpnCrtl = require('../controllers/coupon.js');
 const {createCouponSchema, updateCouponSchema}= require('../validations/coupon.js');
 const {validate} = require ('../middleware/validate.js');
+const {auth,restrictTo} = require('../middleware/auth.js');
 
+router.use(auth,restrictTo('ADMIN'));
 
 router.get('/',cpnCrtl.getAllCpns);
 router.post('/',validate(createCouponSchema),cpnCrtl.createCpn);

@@ -3,7 +3,7 @@ const orderService = require('../services/order.js');
 const checkout = async (req, res) => {
     try {
         const orderData = req.body;
-        const userId = 'f472b9bf-8fb8-4f9a-9737-6314ffac538e';
+        const userId = req.userId;
         const result = await orderService.checkout(userId,orderData);
         if(result.error)
         {

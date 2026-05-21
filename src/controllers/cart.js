@@ -2,7 +2,7 @@ const cartService = require('../services/cart.js');
 
 const getCart = async (req, res) => {
     try {
-        const userId = 'f472b9bf-8fb8-4f9a-9737-6314ffac538e';
+        const userId = req.userId;
         const cart = await cartService.getCart(userId);
         if (cart) {
             res.status(200).json({
@@ -20,7 +20,7 @@ const getCart = async (req, res) => {
 };
 const addToCart = async (req, res) => {
     try {
-        const userId = 'f472b9bf-8fb8-4f9a-9737-6314ffac538e';
+        const userId = req.userId;
         const item = req.body;
         const itemAdded = await cartService.addToCart(userId, item);
         if (itemAdded) {
@@ -42,7 +42,7 @@ const addToCart = async (req, res) => {
 const updateItem = async (req, res) => {
     try {
         const id = req.params.id;
-        const userId = 'f472b9bf-8fb8-4f9a-9737-6314ffac538e';
+        const userId = req.userId;
         const updatedItem = req.body;
         const result = await cartService.updateItem(userId, id, updatedItem);
         if (result.error1) {
@@ -68,7 +68,7 @@ const updateItem = async (req, res) => {
 const deleteItem = async (req, res) => {
     try {
         const id = req.params.id;
-        const userId = 'f472b9bf-8fb8-4f9a-9737-6314ffac538e';
+        const userId = req.userId;
         const result = await cartService.deleteItem(userId, id);
         if (result.error1) {
             return res.status(404).json({ message: "Cart item not found." });
