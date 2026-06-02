@@ -3,6 +3,11 @@ const prisma = new PrismaClient();
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+
+const { sendEmail } = require('../utils/sendEmail');
+const { getPasswordResetTemplate } = require('../utils/emailTemplates');
+const { string } = require('joi');
 
 
 const getAllUsers = async () => {
@@ -72,13 +77,80 @@ const login = async (email, password) => {
 
     return { token: token }
 };
+const forget = async (email) => {
+    //make sure email exists 
+    const userFound = await prisma.user.findUnique({ where: { email } });
+    // if not 
+    if (!userFound) {
+        //Stop here
+        return;
+    }
+    // if it does , Proceed
+    //1. Generate OTP
+    const otp = crypto.randomInt(100000, 1000000);
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 30);
+    //2. save them to db
+    const userAfterOtp = await prisma.user.update({
+        where: { email },
+        data: {
+            otpCode: String(otp),
+            otpExpiresAt: expiresAt
+        }
+    })
+    //. send email with otp 
+    const { subject, html, text } = getPasswordResetTemplate(otp);
+    sendEmail({
+        to: 'dohabackup99@gmail.com',
+        subject,
+        text,
+        html
+    });
 
+};
+const verifyOtp = async (email, otpCode) => {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+        const isExpired = new Date() > user.otpExpiresAt;
+        if (otpCode === user.otpCode && isExpired) {
+            return { error2: "otp code has expired try requesting a new one" }
+        }
+        else if (otpCode != user.otpCode) {
+            return { error1: "otp code is incorrect" }
+        }
+        return { message: "verification code is correct" }
+    }
+};
+const resetPassword = async (email, otpCode, newPassword) => {
+    const verification = await verifyOtp(email, otpCode);
+    if (!verification.message) {
+        return { error: "something is wrong otp is expired or incorrect" }
+    }
+    const salt = await bcrypt.genSalt(10);
+    const newPasswordHashed = await bcrypt.hash(newPassword, salt);
+    const user = await prisma.user.findUnique({ where: { email } });
+    console.log(user)
+    user.password = newPasswordHashed;
+    const updatedUser = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            password: newPasswordHashed,
+            otpCode:null,
+            otpExpiresAt:null
+        }
+    })
+    console.log(updatedUser)
 
+    return updatedUser;
+};
 module.exports = {
     getAllUsers,
     createUser,
     getUserById,
     updateUser,
     deleteUser,
-    login
+    login,
+    forget,
+    verifyOtp,
+    resetPassword
 }

@@ -119,6 +119,50 @@ const login = async (req, res) => {
         res.status(500).json({ message: "failed to login" })
     }
 };
+const forget = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const reply = await userService.forget(email);
+        res.status(200).json({ message: "If an account exists with this email, a reset code has been sent" })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "failed to process forget" })
+    }
+
+};
+const verfiyOtp = async (req, res) => {
+    try {
+        const { email, otpCode } = req.body;
+        const reply = await userService.verifyOtp(email, otpCode);
+        if (reply.error1) {
+            return res.status(400).json({ message: reply.error1 })
+        }
+        if (reply.error2) {
+            return res.status(410).json({ message: reply.error2 })
+        }
+        res.status(200).json({ message: reply.message })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "failed to verfiy otp" })
+    }
+};
+const resetPassword = async(req,res)=>{
+    try {
+        const {email,otpCode,newPassword} = req.body;
+        
+        const reply =  await userService.resetPassword(email,otpCode,newPassword);
+        if(reply.error)
+        {
+            return res.status(400).json({ message: reply.error })
+        }
+        res.status(200).json({ message: "password reseted successfully"
+         });
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "failed to reset password" })
+    }
+};
 
 
 module.exports = {
@@ -127,5 +171,8 @@ module.exports = {
     getUserById,
     updateUser,
     deleteUser,
-    login
+    login,
+    forget,
+    verfiyOtp,
+    resetPassword
 };

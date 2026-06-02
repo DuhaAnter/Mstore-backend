@@ -24,6 +24,9 @@ model User {
   cart             Cart?
   stripeCustomerId String? // The ID of the "Customer" object in Stripe
   paymentCards     PaymentCard[]
+  // for the reset password feature
+  otpCode          String?
+  otpExpiresAt     DateTime?
 }
 
 model PaymentCard {
