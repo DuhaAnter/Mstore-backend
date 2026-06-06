@@ -106,8 +106,14 @@ const login = async (req, res) => {
         if (result.error2) {
             res.status(401).json({ message: "wrong password try again" })
         }
+        const cookieOptions = {
+            httpOnly: true,                         // Prevents client-side JS from accessing the cookie
+            secure: process.env.NODE_ENV === 'production', // Use HTTPS in production "will return true if production"
+            sameSite: 'strict',                     // Protects against CSRF attacks
+            expiresIn: Date.now() + 7 * 24 * 60 * 60 * 1000   
+        };
         if (result.token) {
-            res.status(200).json({
+            res.status(200).cookie('token', result.token, cookieOptions).json({
                 message: "success u r logged in",
                 data: result
             })
@@ -134,11 +140,14 @@ const verfiyOtp = async (req, res) => {
     try {
         const { email, otpCode } = req.body;
         const reply = await userService.verifyOtp(email, otpCode);
-        if (reply.error1) {
-            return res.status(400).json({ message: reply.error1 })
+        if (reply.error404) {
+            return res.status(404).json({ message: reply.error404 })
         }
-        if (reply.error2) {
-            return res.status(410).json({ message: reply.error2 })
+        if (reply.error410) {
+            return res.status(410).json({ message: reply.error410 })
+        }
+        if (reply.error400) {
+            return res.status(400).json({ message: reply.error400 })
         }
         res.status(200).json({ message: reply.message })
     } catch (error) {
@@ -146,18 +155,18 @@ const verfiyOtp = async (req, res) => {
         res.status(500).json({ message: "failed to verfiy otp" })
     }
 };
-const resetPassword = async(req,res)=>{
+const resetPassword = async (req, res) => {
     try {
-        const {email,otpCode,newPassword} = req.body;
-        
-        const reply =  await userService.resetPassword(email,otpCode,newPassword);
-        if(reply.error)
-        {
+        const { email, otpCode, newPassword } = req.body;
+
+        const reply = await userService.resetPassword(email, otpCode, newPassword);
+        if (reply.error) {
             return res.status(400).json({ message: reply.error })
         }
-        res.status(200).json({ message: "password reseted successfully"
-         });
-        
+        res.status(200).json({
+            message: "password reseted successfully"
+        });
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "failed to reset password" })

@@ -110,16 +110,20 @@ const forget = async (email) => {
 };
 const verifyOtp = async (email, otpCode) => {
     const user = await prisma.user.findUnique({ where: { email } });
-    if (user) {
-        const isExpired = new Date() > user.otpExpiresAt;
-        if (otpCode === user.otpCode && isExpired) {
-            return { error2: "otp code has expired try requesting a new one" }
-        }
-        else if (otpCode != user.otpCode) {
-            return { error1: "otp code is incorrect" }
-        }
-        return { message: "verification code is correct" }
+    if (!user) {
+        return { error404: "user not found" }
     }
+
+    const isExpired = new Date() > user.otpExpiresAt;
+    if (otpCode === user.otpCode && isExpired) {
+        return { error410: "otp code has expired try requesting a new one" }
+    }
+    else if (otpCode != user.otpCode) {
+        return { error400: "otp code is incorrect" }
+    }
+
+    return { message: "verification code is correct" }
+
 };
 const resetPassword = async (email, otpCode, newPassword) => {
     const verification = await verifyOtp(email, otpCode);
@@ -135,8 +139,8 @@ const resetPassword = async (email, otpCode, newPassword) => {
         where: { id: user.id },
         data: {
             password: newPasswordHashed,
-            otpCode:null,
-            otpExpiresAt:null
+            otpCode: null,
+            otpExpiresAt: null
         }
     })
     console.log(updatedUser)

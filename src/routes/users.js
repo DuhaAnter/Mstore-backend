@@ -18,7 +18,7 @@ router.delete('/:id',userCtrl.deleteUser);
 //login
 router.post('/login',validate(loginSchema),userCtrl.login);
 //forget_password
-router.post('/forget_password',validate(forgetSchema),userCtrl.forget);
+router.post('/forget-password',validate(forgetSchema),userCtrl.forget);
 router.post('/verify-otp',validate(verifyOtpSchema),userCtrl.verfiyOtp);
 router.post('/reset-password',validate(resetPasswordSchema),userCtrl.resetPassword);
 
