@@ -3,8 +3,29 @@ const prisma = new PrismaClient();
 
 
 const getAllProducts = async () => {
-    const products = await prisma.product.findMany();
-    return products;
+    const products = await prisma.product.findMany({
+        include: {
+            variants: true
+        }
+    });
+
+    const productsWithPrices = products.map((product) => {
+        if (product.variants && product.variants.length > 0) {
+            const prices = product.variants.map(variant => variant.price);
+            const minPrice = Math.min(...prices);
+            return {
+                ...product,
+                minPrice: minPrice
+            }
+        }//end of if
+
+        //if no variants
+        return{
+            ...product,
+            minPrice:0
+        }
+    })//end of first map
+    return productsWithPrices;
 
 };
 
@@ -31,13 +52,13 @@ const deleteProduct = async (id) => {
     return deletedProduct;
 };
 
-const updateProduct = async(id, updatedData)=>{
-    
+const updateProduct = async (id, updatedData) => {
+
 
     const updatedProduct = await prisma.product.update({
         where:
         {
-            id:id,
+            id: id,
 
         },
         data: updatedData
@@ -45,12 +66,12 @@ const updateProduct = async(id, updatedData)=>{
     return (updatedProduct);
 };
 
-const createProduct = async (product)=>{
+const createProduct = async (product) => {
 
     const createdProduct = await prisma.product.create({
-        data : product
+        data: product
     })
-    return(createdProduct);
+    return (createdProduct);
 };
 
 

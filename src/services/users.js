@@ -75,7 +75,7 @@ const login = async (email, password) => {
         , process.env.SECRET
         , { expiresIn: '7d' })
 
-    return { token: token }
+    return { token: token ,user:user}
 };
 const forget = async (email) => {
     //make sure email exists 
