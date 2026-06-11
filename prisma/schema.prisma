@@ -12,6 +12,14 @@ datasource db {
 //Using OrderItem with priceAtPurchase means that if you raise the price of a t-shirt tomorrow, your sales reports for today won't break.
 //Linking the Cart and Order to the Variant instead of the Product is the "secret sauce" for clothing stores. it ensures the warehouse knows exactly which size and color were purchased.
 
+//............adding on Delete : cascade in cart and cartItem model...................
+// This automatically:
+// 1. Deletes the Cart (because Cart.userId references User.id with Cascade)
+// 2. Deletes all CartItems (because CartItem.cartId references Cart.id with Cascade)
+// 3. Then deletes the User
+
+
+
 model User {
   id               String        @id @default(uuid())
   name             String
@@ -42,14 +50,16 @@ model PaymentCard {
 
 model Cart {
   id     String     @id @default(uuid())
-  user   User       @relation(fields: [userId], references: [id])
+  //when user is deleted delete its cart
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String     @unique
   items  CartItem[] // Use a separate model for items in the cart
 }
 
 model CartItem {
   id        String  @id @default(uuid())
-  cart      Cart    @relation(fields: [cartId], references: [id])
+  //when cart is deleted delete the cart items of this deleted cart
+  cart      Cart    @relation(fields: [cartId], references: [id] , onDelete:  Cascade)
   cartId    String
   variant   Variant @relation(fields: [variantId], references: [id])
   variantId String
@@ -126,8 +136,8 @@ model Review {
   createdAt DateTime @default(now())
   product   Product  @relation(fields: [productId], references: [id])
   productId String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
+  user      User?    @relation(fields: [userId], references: [id],onDelete: SetNull)
+  userId    String?
 
   // This ensures a user can't spam reviews on a single product
   @@unique([userId, productId])

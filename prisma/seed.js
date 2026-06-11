@@ -57,16 +57,16 @@ async function main() {
       data: {
         title: faker.commerce.productName(),
         description: faker.commerce.productDescription(),
-        imageURL: faker.image.urlLoremFlickr({ category: 'fashion' }),
-        stock: faker.number.int({ min: 50, max: 500 }),
+        imageURL:`https://picsum.photos/id/${faker.number.int({ min: 10, max: 99 })}/400/500`,
+        //we removed stock from product to variant
         categoryId: randomBridge.categoryId,
         subCategoryId: randomBridge.subCategoryId,
         // Every product needs a few variants (Sizes/Colors)
         variants: {
           create: [
-            { color: faker.color.human(), size: 'S', price: basePrice },
-            { color: faker.color.human(), size: 'M', price: basePrice },
-            { color: faker.color.human(), size: 'L', price: basePrice },
+            { color: faker.color.human(), size: 'S', price: basePrice ,stock: faker.number.int({ min: 50, max: 500 })},
+            { color: faker.color.human(), size: 'M', price: basePrice ,stock: faker.number.int({ min: 50, max: 500 })},
+            { color: faker.color.human(), size: 'L', price: basePrice ,stock: faker.number.int({ min: 50, max: 500 })},
           ]
         }
       },
