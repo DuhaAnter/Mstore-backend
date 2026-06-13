@@ -63,7 +63,7 @@ const updateReview = async (req, res) => {
 const deleteReview = async (req, res) => {
     try {
         const { id } = req.params; // review id
-        const userId = 'f472b9bf-8fb8-4f9a-9737-6314ffac538e';
+        const userId = req.userId;
         const result = await reviewService.deleteReview(id,userId);
         if (result.error1) {
             return res.status(404).json({ message: result.error1 });
