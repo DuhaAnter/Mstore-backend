@@ -37,8 +37,8 @@ app.get('/', (req, res) => {
 // app.use('/reviews',reviewRoutes);
 
 
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
-module.exports= app;
+// module.exports= app;
