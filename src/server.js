@@ -5,12 +5,12 @@ const cookieParser = require('cookie-parser');
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT ;
+// const PORT = process.env.PORT ;
 
-app.use(cors({
-  origin: 'http://localhost:5173', // Your exact React/Vite frontend URL (no trailing slash!)
-  credentials: true                // Allowed to receive cookies from the frontend
-}));
+// app.use(cors({
+//   origin: 'http://localhost:5173', // Your exact React/Vite frontend URL (no trailing slash!)
+//   credentials: true                // Allowed to receive cookies from the frontend
+// }));
 app.use(express.json());
 app.use(cookieParser());
 // Import routes
