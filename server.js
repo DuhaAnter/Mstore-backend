@@ -14,14 +14,14 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 // Import routes
-// const productRoutes = require('./routes/products');
-// const userRoutes = require ('./routes/users.js');
-// const categoryRoutes =require('./routes/categories.js');
-// const subCategoryRoutes =require('./routes/subCategories.js');
-// const cartRoutes = require('./routes/cart.js');
-// const orderRoutes = require('./routes/order.js');
-// const couponRoutes = require ('./routes/coupon.js');
-// const reviewRoutes = require('./routes/review.js');
+// const productRoutes = require('./src/routes/products.js');
+// const userRoutes = require ('./src/routes/users.js');
+// const categoryRoutes =require('./src/routes/categories.js');
+// const subCategoryRoutes =require('./src/routes/subCategories.js');
+// const cartRoutes = require('./src/routes/cart.js');
+// const orderRoutes = require('./src/routes/order.js');
+// const couponRoutes = require ('./src/routes/coupon.js');
+// const reviewRoutes = require('./src/routes/review.js');
 // main route
 app.get('/', (req, res) => {
   res.json({ message: 'M-Store Backend is running' });
@@ -37,8 +37,8 @@ app.get('/', (req, res) => {
 // app.use('/reviews',reviewRoutes);
 
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
 
-// module.exports= app;
+module.exports= app;
