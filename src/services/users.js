@@ -60,7 +60,12 @@ const deleteUser = async (id) => {
 };
 const login = async (email, password) => {
     // make sure user exist before comparing passwords
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+        where: { email },
+        include: {
+            cart: { include: { items: true } }
+        }
+    });
     if (!user) {
         return { error1: "email does not exist" }
     }
@@ -75,7 +80,7 @@ const login = async (email, password) => {
         , process.env.SECRET
         , { expiresIn: '7d' })
 
-    return { token: token ,user:user}
+    return { token: token, user: user }
 };
 const forget = async (email) => {
     //make sure email exists 

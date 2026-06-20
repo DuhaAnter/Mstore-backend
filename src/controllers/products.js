@@ -104,10 +104,33 @@ const deleteProduct = async (req, res) => {
 
 };
 
+const getProductsByCategory = async (req,res)=>{
+    try {
+        //category id
+        const id = req.params.id;
+        const products = await productsService.getProductsByCategory(id);
+        if(products.error)
+        {
+            return res.status(404).json({
+                message: products.error
+            })
+        }
+        res.status(200).json({
+            message: "products by category retrived successfully",
+            products: products
+        });
+        
+    } catch (error) {
+        console.log(error);
+         res.status(500).json({ message: "failed to get products by category" })
+    }
+}
+
 module.exports = {
     getAllProducts,
     getProductById,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getProductsByCategory
 };

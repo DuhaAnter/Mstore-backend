@@ -74,11 +74,27 @@ const createProduct = async (product) => {
     return (createdProduct);
 };
 
+const getProductsByCategory = async (id)=>{
+    //make sure the category exist first
+    const cate = await prisma.category.findUnique({
+        where: { id: id }
+    })
+    if(!cate) 
+    {
+        return {error:"category doesn't exist"};
+    }
+    const products = await prisma.product.findMany({
+        where:{categoryId: id}
+    })
+    return products;
+}
+
 
 module.exports = {
     getAllProducts,
     getProductById,
     deleteProduct,
     updateProduct,
-    createProduct
+    createProduct,
+    getProductsByCategory
 }

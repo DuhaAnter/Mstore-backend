@@ -14,4 +14,7 @@ router.delete('/:id', productCtrl.deleteProduct);
 router.use('/:id/variants', variantRoutes);
 //reviews
 router.use('/:id/reviews', reviewRoutes);
+// get products in certain category
+router.use('/category/:id', productCtrl.getProductsByCategory);
+
 module.exports = router;
