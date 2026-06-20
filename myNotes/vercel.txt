@@ -6,3 +6,5 @@
 1. create vercel.json
 2. export app and comment app.listen() .
 3. make sure server file is in the place provided in vervel.json in both src and dest properties. 
+
+-- the new db on vercel --> i  had connect my local server with it so i can migrate the schema and seed the db using my local device.
