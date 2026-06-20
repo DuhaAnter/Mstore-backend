@@ -1,0 +1,8 @@
+-- the main issue was with the place of the server.js file .where ever it is make sure u provided the right path in vercel.json .
+
+-- and u need to export the app and not use app.listen() .
+
+-- so just 3 steps :
+1. create vercel.json
+2. export app and comment app.listen() .
+3. make sure server file is in the place provided in vervel.json in both src and dest properties. 
