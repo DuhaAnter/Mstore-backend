@@ -14,8 +14,8 @@ async function main() {
   await prisma.subCategory.deleteMany();
   await prisma.category.deleteMany();
 
-  
-  
+
+
   // 1. Create 3 Categories
   const categories = await Promise.all([
     prisma.category.create({ data: { name: 'Men' } }),
@@ -51,7 +51,38 @@ async function main() {
   // 4. Create 100 Products
   for (let i = 0; i < 100; i++) {
     const randomBridge = bridges[Math.floor(Math.random() * bridges.length)];
-    const basePrice = parseFloat(faker.commerce.price({ min: 20, max: 200 }));
+    const basePrice = parseFloat(
+      faker.commerce.price({ min: 20, max: 200 })
+    );
+
+    // Pick 3 colors for this product
+    const colors = [
+      faker.color.human(),
+      faker.color.human(),
+      faker.color.human(),
+    ];
+
+    // Remove duplicate colors if Faker generates the same one twice
+    const uniqueColors = [...new Set(colors)];
+
+    const sizes = ["S", "M", "L"];
+
+    const variants = [];
+
+    for (const color of uniqueColors) {
+      // Each color has a small price difference
+      const colorPrice =
+        basePrice + faker.number.int({ min: 0, max: 20 });
+
+      for (const size of sizes) {
+        variants.push({
+          color,
+          size,
+          price: size === "L" ? colorPrice + 5 : colorPrice,
+          stock: faker.number.int({ min: 50, max: 500 }),
+        });
+      }
+    }
 
     await prisma.product.create({
       data: {
@@ -63,17 +94,13 @@ async function main() {
         subCategoryId: randomBridge.subCategoryId,
         // Every product needs a few variants (Sizes/Colors)
         variants: {
-          create: [
-            { color: faker.color.human(), size: 'S', price: basePrice ,stock: faker.number.int({ min: 50, max: 500 })},
-            { color: faker.color.human(), size: 'M', price: basePrice ,stock: faker.number.int({ min: 50, max: 500 })},
-            { color: faker.color.human(), size: 'L', price: basePrice ,stock: faker.number.int({ min: 50, max: 500 })},
-          ]
-        }
+          create: variants,
+        },
       },
     });
   }
 
-  
+
 
   // 5. Create 3 Coupons
   await prisma.coupon.createMany({

@@ -2,13 +2,20 @@ const jwt = require('jsonwebtoken');
 
 exports.auth = (req, res, next) => {
     try {
-        const { authorization } = req.headers;
-        if (!authorization) {
+        // const { authorization } = req.headers;
+        // if (!authorization) {
+        //     return res.status(401).json({
+        //         message: "you are not logged in , please log in first"
+        //     })
+        // }
+        const token = req.cookies.token;
+        if (!token) {
             return res.status(401).json({
-                message: "you are not logged in , please log in first"
-            })
+                message: "You are not logged in , please log in first",
+            });
         }
-        const decoded = jwt.verify(authorization, process.env.SECRET);
+        //const decoded = jwt.verify(authorization, process.env.SECRET);
+        const decoded = jwt.verify(token, process.env.SECRET);
         console.log(decoded);
         req.userId = decoded.id;
         req.userRole = decoded.role;
@@ -16,7 +23,7 @@ exports.auth = (req, res, next) => {
         //proceed
         next();
     } catch (error) {
-        res.status(401).json({
+        res.status(400).json({
             message: "fail from authorization u are not authenticated"
         })
     }

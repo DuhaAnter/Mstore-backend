@@ -63,7 +63,19 @@ const login = async (email, password) => {
     const user = await prisma.user.findUnique({
         where: { email },
         include: {
-            cart: { include: { items: true } }
+            cart: {
+                include: {
+                    items: {
+                        select: {
+                            quantity: true
+                        }
+                    }
+                },
+                omit: {
+                    id: true,
+                    userId: true
+                }
+            }
         }
     });
     if (!user) {

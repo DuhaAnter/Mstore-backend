@@ -4,7 +4,15 @@ const prisma = new PrismaClient();
 const addToCart = async (userId, item) => {
     // Check if this user has a cart
     const cart = await prisma.cart.findUnique({
-        where: { userId }
+        where: { userId },
+        include: {
+            items: {
+                omit: {
+                    cartId: true
+                }
+            }
+
+        }
     });
 
     let cartId;
@@ -35,7 +43,7 @@ const addToCart = async (userId, item) => {
             }
         });
 
-        return itemExistInCart;
+        return cart;
 
     } else {
         //it's new item , add (create) it
@@ -76,11 +84,11 @@ const updateItem = async (userId, itemId, updatedItemData) => {
     });
 
     if (!cartItem) {
-        return {error1:"Cart item not found"}
+        return { error1: "Cart item not found" }
     }
 
     if (cartItem.cart.userId !== userId) {
-        return {error2:"Not authorized to update this cart item"}
+        return { error2: "Not authorized to update this cart item" }
     }
 
     const updatedItem = await prisma.cartItem.update({
@@ -90,7 +98,7 @@ const updateItem = async (userId, itemId, updatedItemData) => {
 
     return updatedItem;
 };
-const deleteItem = async (userId,itemId)=>{
+const deleteItem = async (userId, itemId) => {
     const cartItem = await prisma.cartItem.findUnique({
         where: { id: itemId },
         include: {
@@ -99,15 +107,15 @@ const deleteItem = async (userId,itemId)=>{
     });
 
     if (!cartItem) {
-        return {error1:"Cart item not found"}
+        return { error1: "Cart item not found" }
     }
 
     if (cartItem.cart.userId !== userId) {
-        return {error2:"Not authorized to delete this cart item"}
+        return { error2: "Not authorized to delete this cart item" }
     }
 
     const deletedItem = await prisma.cartItem.delete({
-      where: { id: itemId }
+        where: { id: itemId }
     });
 
     return deletedItem;

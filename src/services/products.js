@@ -20,9 +20,9 @@ const getAllProducts = async () => {
         }//end of if
 
         //if no variants
-        return{
+        return {
             ...product,
-            minPrice:0
+            minPrice: 0
         }
     })//end of first map
     return productsWithPrices;
@@ -34,6 +34,9 @@ const getProductById = async (id) => {
         where:
         {
             id: id
+        },
+        include: {
+            variants: true
         }
     });
     return product;
@@ -74,17 +77,16 @@ const createProduct = async (product) => {
     return (createdProduct);
 };
 
-const getProductsByCategory = async (id)=>{
+const getProductsByCategory = async (id) => {
     //make sure the category exist first
     const cate = await prisma.category.findUnique({
         where: { id: id }
     })
-    if(!cate) 
-    {
-        return {error:"category doesn't exist"};
+    if (!cate) {
+        return { error: "category doesn't exist" };
     }
     const products = await prisma.product.findMany({
-        where:{categoryId: id}
+        where: { categoryId: id }
     })
     return products;
 }
