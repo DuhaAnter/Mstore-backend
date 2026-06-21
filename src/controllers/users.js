@@ -109,7 +109,7 @@ const login = async (req, res) => {
         const cookieOptions = {
             httpOnly: true,                         // Prevents client-side JS from accessing the cookie
             secure: process.env.NODE_ENV === 'production', // Use HTTPS in production "will return true if production"
-            sameSite: 'strict',                     // Protects against CSRF attacks
+            sameSite: 'none',                     // Protects against CSRF attacks
             expiresIn: Date.now() + 7 * 24 * 60 * 60 * 1000   
         };
         if (result.token) {
