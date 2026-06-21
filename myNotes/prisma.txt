@@ -38,4 +38,64 @@ note: The migrate command usually triggers a "generate" automatically, but you c
 }
 4- run it 
 ##npx prisma db seed
+____________________________________________________________
+--> npx prisma migrate deploy:
+-It does not create migrations.
+-It only executes migrations that already exist.
+-hence It never generates new SQL.
+-it cannot replace migrate dev bc it executes what migrate dev created (the sql files).
+
+--> npx prisma db push:
+-Think of it as a contractor who only cares about the final blueprint.
+-Prisma only knows
+"What should the database look like right now?"
+It forgets how it got there.
+-No history exists.
+
+--> npx prisma migrate dev:
+-a different contractor,Every time you change the blueprint, he writes a report(migration file).
+-Every migration contains SQL.
+-Imagine Git
+When you use Git you don't just care about your current code.
+You care about:
+1.commit history
+2.who changed what
+3.when
+Migrations are exactly like Git commits.
+Each migration is one commit in your database's history.
+
+-- What does db push store?
+Nothing.
+Schema
+↓
+Database
+That's it.
+
+-- What does migrate dev store?
+Schema
+↓
+Migration SQL
+↓
+Database
+↓
+_prisma_migrations table
+
+Notice there are two histories:
+On disk
+prisma/migrations/
+Inside the database
+_prisma_migrations
+
+Those two histories must always agree and That's why Prisma complained about drift.
+
+-----------
+-migrate dev creates migrations.
+-migrate deploy applies migrations.
+
+-db push is completely separate :
+it skips the migration system entirely and simply makes the database match your current schema.
+That's why it's excellent for quick experiments, but once you start relying on migrations, you generally stop using db push on that database.
+
+
+
 
