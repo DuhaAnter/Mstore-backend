@@ -16,7 +16,7 @@ exports.auth = (req, res, next) => {
         }
         //const decoded = jwt.verify(authorization, process.env.SECRET);
         const decoded = jwt.verify(token, process.env.SECRET);
-        console.log(decoded);
+        //console.log(decoded);
         req.userId = decoded.id;
         req.userRole = decoded.role;
         req.userName = decoded.name;

@@ -5,14 +5,7 @@ const addToCart = async (userId, item) => {
     // Check if this user has a cart
     const cart = await prisma.cart.findUnique({
         where: { userId },
-        include: {
-            items: {
-                omit: {
-                    cartId: true
-                }
-            }
-
-        }
+        select: {id:true}
     });
 
     let cartId;
@@ -35,15 +28,28 @@ const addToCart = async (userId, item) => {
     });
 
     if (itemExistInCart) {
+        console.log('old quantity:',itemExistInCart.quantity)
+        console.log('new quantity:',item.quantity)
         //tell Prisma to update the quantity in the database
-        await prisma.cartItem.update({
+        const a7a = await prisma.cartItem.update({
             where: { id: itemExistInCart.id },
             data: {
                 quantity: itemExistInCart.quantity + (item.quantity || 1)
             }
         });
-
-        return cart;
+        console.log('total',a7a.quantity)
+        return await prisma.cart.findUnique({
+            where:{id:cartId},
+            include: {
+            items: {
+                omit: {
+                    cartId: true,
+                    id:true,
+                    variantId:true
+                }
+            }
+        }
+        });
 
     } else {
         //it's new item , add (create) it
@@ -54,7 +60,18 @@ const addToCart = async (userId, item) => {
             }
         });
 
-        return newItemAdded;
+        return await prisma.cart.findUnique({
+            where:{id:cartId},
+            include: {
+            items: {
+                omit: {
+                    cartId: true,
+                    id:true,
+                    variantId:true
+                }
+            }
+        }
+        });
     }
 };
 const getCart = async (userId) => {

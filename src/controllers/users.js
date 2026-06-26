@@ -106,11 +106,13 @@ const login = async (req, res) => {
         if (result.error2) {
             res.status(401).json({ message: "wrong password try again" })
         }
+        const isProduction = process.env.NODE_ENV === 'production';
+
         const cookieOptions = {
-            httpOnly: true,                         // Prevents client-side JS from accessing the cookie
-            secure: process.env.NODE_ENV === 'production', // Use HTTPS in production "will return true if production"
-            sameSite: 'none',                     // Protects against CSRF attacks
-            expiresIn: Date.now() + 7 * 24 * 60 * 60 * 1000   
+            httpOnly: true,                    // ← Almost always true for auth cookies
+            secure: isProduction,              // true in prod, false in local (localhost)
+            sameSite: isProduction ? 'none' : 'lax',   // Adjust based on your setup
+            maxAge: 7 * 24 * 60 * 60 * 1000,   // 7 days (correct way)
         };
         if (result.token) {
             res.status(200).cookie('token', result.token, cookieOptions).json({
