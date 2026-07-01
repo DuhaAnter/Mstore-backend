@@ -5,7 +5,7 @@ const addToCart = async (userId, item) => {
     // Check if this user has a cart
     const cart = await prisma.cart.findUnique({
         where: { userId },
-        select: {id:true}
+        select: { id: true }
     });
 
     let cartId;
@@ -28,8 +28,8 @@ const addToCart = async (userId, item) => {
     });
 
     if (itemExistInCart) {
-        console.log('old quantity:',itemExistInCart.quantity)
-        console.log('new quantity:',item.quantity)
+        console.log('old quantity:', itemExistInCart.quantity)
+        console.log('new quantity:', item.quantity)
         //tell Prisma to update the quantity in the database
         const a7a = await prisma.cartItem.update({
             where: { id: itemExistInCart.id },
@@ -37,18 +37,18 @@ const addToCart = async (userId, item) => {
                 quantity: itemExistInCart.quantity + (item.quantity || 1)
             }
         });
-        console.log('total',a7a.quantity)
+        console.log('total', a7a.quantity)
         return await prisma.cart.findUnique({
-            where:{id:cartId},
+            where: { id: cartId },
             include: {
-            items: {
-                omit: {
-                    cartId: true,
-                    id:true,
-                    variantId:true
+                items: {
+                    omit: {
+                        cartId: true,
+                        id: true,
+                        variantId: true
+                    }
                 }
             }
-        }
         });
 
     } else {
@@ -61,16 +61,16 @@ const addToCart = async (userId, item) => {
         });
 
         return await prisma.cart.findUnique({
-            where:{id:cartId},
+            where: { id: cartId },
             include: {
-            items: {
-                omit: {
-                    cartId: true,
-                    id:true,
-                    variantId:true
+                items: {
+                    omit: {
+                        cartId: true,
+                        id: true,
+                        variantId: true
+                    }
                 }
             }
-        }
         });
     }
 };
@@ -96,24 +96,34 @@ const updateItem = async (userId, itemId, updatedItemData) => {
     const cartItem = await prisma.cartItem.findUnique({
         where: { id: itemId },
         include: {
-            cart: true
+            cart: true,
+            variant: true
         }
     });
 
     if (!cartItem) {
-        return { error1: "Cart item not found" }
+        return { status: "NOT_FOUND" }
     }
 
     if (cartItem.cart.userId !== userId) {
-        return { error2: "Not authorized to update this cart item" }
+        return { status: "FORBIDDEN" }
     }
 
-    const updatedItem = await prisma.cartItem.update({
-        where: { id: itemId },
-        data: { quantity: updatedItemData.quantity }
-    });
+    if (updatedItemData.quantity > 0 && cartItem.variant.stock >= updatedItemData.quantity) {
+        const updatedItem = await prisma.cartItem.update({
+            where: { id: itemId },
+            data: { quantity: updatedItemData.quantity }
+        });
+        return { status: "success", messsage: "item updated" };
+    } else if (updatedItemData.quantity == 0) {
+        const deletedItem = await deleteItem(userId, itemId);
+        return { status: "success", messsage: "item deleted" };
+    } else if (cartItem.variant.stock < updatedItemData.quantity) {
+        return { insufficientStock: true }
+    }
 
-    return updatedItem;
+
+
 };
 const deleteItem = async (userId, itemId) => {
     const cartItem = await prisma.cartItem.findUnique({

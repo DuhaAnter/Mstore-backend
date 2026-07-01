@@ -45,18 +45,22 @@ const updateItem = async (req, res) => {
         const userId = req.userId;
         const updatedItem = req.body;
         const result = await cartService.updateItem(userId, id, updatedItem);
-        if (result.error1) {
+        if (result.status === "NOT_FOUND") {
             return res.status(404).json({ message: "Cart item not found." });
         }
 
-        if (result.error2) {
+        if (result.status === "FORBIDDEN") {
             return res.status(403).json({
                 message: "Not authorized to update this cart item."
             });
         }
+        if (result.insufficientStock) {
+            return res.status(400).json({
+                message: "insufficient Stock"
+            });
+        }
 
-
-        res.status(200).json({ message: "item updated successfully", data: result })
+        res.status(200).json({ status: result.status, message: result.messsage })
 
     } catch (error) {
         console.log(error);
