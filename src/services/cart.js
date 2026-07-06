@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const { date, valid } = require('joi');
 const prisma = new PrismaClient();
 
 const addToCart = async (userId, item) => {
@@ -87,10 +88,24 @@ const getCart = async (userId) => {
                         }
                     }
                 }
-            }
+            },
+            coupon: true
         }
     })
-    return cart.items;
+    let subtotal = 0;
+    (cart.items).forEach(item => {
+        subtotal += item.variant.price * item.quantity;
+    });
+
+    let discount = 0;
+
+    if (cart.coupon) {
+        discount = (subtotal * cart.coupon.discount) / 100;
+    }
+    const discountedSubtotal = subtotal - discount;
+    const tax = discountedSubtotal * 0.01;
+    const total = discountedSubtotal + tax;
+    return { cart: cart.items, summary: { subtotal, tax, total , discount } };
 };
 const updateItem = async (userId, itemId, updatedItemData) => {
     const cartItem = await prisma.cartItem.findUnique({
@@ -145,7 +160,36 @@ const deleteItem = async (userId, itemId) => {
         where: { id: itemId }
     });
 
-    return deletedItem;
+    return { status: "success", message: "item deleted" };
+};
+const applyCoupon = async (userId, code) => {
+    const cpn = await prisma.coupon.findUnique({
+        where: { code }
+    });
+    if (!cpn) {
+        return { status: "NOT_FOUND" }
+    }
+    // if found , verfiy it's still valid 
+    const currentTime = new Date();
+    if (currentTime > cpn.expiresAt) {
+        return { valid: false }
+    }
+    // if it is valid ,link it to the user cart
+    const cart = await prisma.cart.findUnique({
+        where: { userId }
+    })
+    if (!cart) {
+        return { status: "NOT_FOUND" }
+    }
+
+    await prisma.cart.update({
+        where: { userId },
+        data: {
+            couponId: cpn.id
+        }
+    })
+    return { valid: true }
+
 };
 
 
@@ -153,6 +197,7 @@ module.exports = {
     addToCart,
     getCart,
     updateItem,
-    deleteItem
+    deleteItem,
+    applyCoupon
 
 };

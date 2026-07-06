@@ -86,8 +86,9 @@ const deleteItem = async (req, res) => {
 
 
         res.status(200).json({
-            message: "item deleted successfully",
-            data: result
+            status: result.status,
+            message: result.message
+
         })
 
     } catch (error) {
@@ -97,9 +98,31 @@ const deleteItem = async (req, res) => {
         })
     }
 };
+const applyCoupon = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const code = req.body.code;
+        const result = await cartService.applyCoupon(userId, code);
+        if (result.status === 'NOT_FOUND') {
+            return res.status(404).json({ message: "this coupon doesn't exist" })
+        }
+        if (result.valid === false) {
+            return res.status(400).json({ message: "this coupon is expired" })
+        }
+
+        return res.status(200).json({ status: 'success', message: "coupon applied successfully" })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "failed to apply coupon"
+        })
+    }
+};
 module.exports = {
     getCart,
     addToCart,
     deleteItem,
-    updateItem
+    updateItem,
+    applyCoupon
 };

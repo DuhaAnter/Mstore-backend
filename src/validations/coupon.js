@@ -22,7 +22,11 @@ const updateCouponSchema = createCouponSchema.fork(
     }
 )
 .min(1);
+const validateCoupon = Joi.object({
+        code : Joi.string().alphanum().uppercase().trim().required()
+});
 module.exports = {
     createCouponSchema,
-    updateCouponSchema
+    updateCouponSchema,
+    validateCoupon
 };
