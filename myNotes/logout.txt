@@ -1,0 +1,74 @@
+# Authentication Bug: Clearing Redux ≠ Logging Out
+
+## The mistake
+
+I assumed that clearing the Redux user state was enough to log the user out.
+
+```js
+dispatch(clearUser());
+```
+
+This only updates the frontend state. It **does not remove the authentication cookie** stored in the browser.
+
+Because my backend authenticates users using an **HTTP-only JWT cookie**, the browser continues sending the cookie with every request (`withCredentials: true`).
+
+As a result:
+
+* Redux says the user is logged out.
+* The browser still has the authentication cookie.
+* The backend still recognizes the user as authenticated.
+* Protected endpoints (e.g. Add to Cart, Checkout) continue working.
+
+## Why it happened
+
+Frontend authentication state (Redux) and backend authentication (HTTP-only cookie) are two separate things.
+
+* **Redux** controls what the UI displays.
+* **The cookie** is what actually proves the user's identity to the backend.
+
+The backend never checks Redux. It only checks the cookie.
+
+## The correct logout flow
+
+1. User clicks Logout.
+2. Frontend sends a request to `POST /auth/logout`.
+3. Backend clears the authentication cookie using `res.clearCookie(...)`.
+4. Browser removes the cookie.
+5. Frontend clears Redux and any persisted user data.
+6. User is now truly logged out.
+
+## Logout endpoint example
+
+```js
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict", // Must match the options used when creating the cookie
+  });
+
+  res.status(200).json({
+    message: "Logged out successfully",
+  });
+});
+```
+
+## Important lesson
+
+If authentication uses HTTP-only cookies:
+
+* Logging in = backend creates the cookie.
+* Logging out = backend must delete the cookie.
+* Clearing Redux alone is never enough.
+///////////////////////////////////////////////////////////////////
+POST /auth/logout
+
+Why is the logout endpoint usually POST?
+
+with an empty body, The browser automatically includes the authentication cookie in the request headers then
+The backend uses that cookie to know which session/token to invalidate or remove.
+-----------------
+Why not GET?
+
+GET requests are meant to be safe and not change server/client state.
+Logging out changes state because it removes the authentication cookie (and sometimes invalidates a server-side session).

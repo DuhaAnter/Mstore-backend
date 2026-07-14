@@ -21,5 +21,7 @@ router.post('/login',validate(loginSchema),userCtrl.login);
 router.post('/forget-password',validate(forgetSchema),userCtrl.forget);
 router.post('/verify-otp',validate(verifyOtpSchema),userCtrl.verfiyOtp);
 router.post('/reset-password',validate(resetPasswordSchema),userCtrl.resetPassword);
+//logout
+router.post('/logout',userCtrl.logout);
 
 module.exports = router;

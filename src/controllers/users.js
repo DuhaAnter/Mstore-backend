@@ -175,6 +175,22 @@ const resetPassword = async (req, res) => {
         res.status(500).json({ message: "failed to reset password" })
     }
 };
+const logout = async (req, res) => {
+    try {
+        const isProduction = process.env.NODE_ENV === 'production';
+
+        const cookieOptions = {
+            httpOnly: true,                    
+            secure: isProduction,              
+            sameSite: isProduction ? 'none' : 'lax',   
+           
+        };
+        res.clearCookie('token',cookieOptions).status(200).json({message:"Logged out successfully"})
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "failed to log user out" })
+    }
+};
 
 
 module.exports = {
@@ -186,5 +202,6 @@ module.exports = {
     login,
     forget,
     verfiyOtp,
-    resetPassword
+    resetPassword,
+    logout
 };
